@@ -1,0 +1,2 @@
+# RFID-Based-Smart-Attendance-System-using-ESP32-Google-Sheets-Integration
+This playlist contains complete ESP32-based projects with circuit diagrams, component connections, source code, working demonstrations, troubleshooting tips, and real-world applications. Whether you are a beginner, engineering student,  or embedded systems enthusiast, these projects will help you learn practical electronics and IoT development.
