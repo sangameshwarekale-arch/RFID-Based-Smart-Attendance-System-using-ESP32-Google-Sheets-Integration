@@ -1,0 +1,68 @@
+function doGet(e) {
+  try {
+    // ── Get parameters from URL ──────────────────────────────────────
+    var name    = e.parameter.name   || "Unknown";
+    var status  = e.parameter.status || "Unknown";
+    var date    = e.parameter.date   || "No Date";
+    var time    = e.parameter.time   || "No Time";
+
+    // ── Open the active spreadsheet ─────────────────────────────────
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+    // ── Add header row if sheet is empty ────────────────────────────
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(["Sr No", "Name", "Status", "Date", "Time", "Logged At"]);
+
+      // Style the header row
+      var headerRange = sheet.getRange(1, 1, 1, 6);
+      headerRange.setBackground("#1565C0");
+      headerRange.setFontColor("#FFFFFF");
+      headerRange.setFontWeight("bold");
+      headerRange.setHorizontalAlignment("center");
+
+      // Set column widths
+      sheet.setColumnWidth(1, 60);   // Sr No
+      sheet.setColumnWidth(2, 120);  // Name
+      sheet.setColumnWidth(3, 100);  // Status
+      sheet.setColumnWidth(4, 110);  // Date
+      sheet.setColumnWidth(5, 100);  // Time
+      sheet.setColumnWidth(6, 180);  // Logged At
+    }
+
+    // ── Serial number = last row (excluding header) ──────────────────
+    var srNo = sheet.getLastRow();  // header is row 1, so this gives 1,2,3...
+
+    // ── Timestamp when server received the request ───────────────────
+    var loggedAt = Utilities.formatDate(
+      new Date(),
+      "Asia/Kolkata",
+      "dd/MM/yyyy HH:mm:ss"
+    );
+
+    // ── Append the data row ──────────────────────────────────────────
+    sheet.appendRow([srNo, name, status, date, time, loggedAt]);
+
+    // ── Color code the row: green for ENTRY, red for EXIT ───────────
+    var lastRow   = sheet.getLastRow();
+    var rowRange  = sheet.getRange(lastRow, 1, 1, 6);
+
+    if (status === "ENTRY") {
+      rowRange.setBackground("#E8F5E9");  // light green
+    } else if (status === "EXIT") {
+      rowRange.setBackground("#FFEBEE");  // light red
+    }
+
+    rowRange.setHorizontalAlignment("center");
+
+    // ── Return success ───────────────────────────────────────────────
+    return ContentService
+      .createTextOutput("ENTRY SAVED")
+      .setMimeType(ContentService.MimeType.TEXT);
+
+  } catch (error) {
+    // ── Return error message so ESP32 can log it ─────────────────────
+    return ContentService
+      .createTextOutput("ERROR: " + error.message)
+      .setMimeType(ContentService.MimeType.TEXT);
+  }
+}
